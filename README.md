@@ -10,6 +10,16 @@ encoders and the UNet are shuttled to the GPU one at a time and parked back in
 system RAM afterwards, while latents and text embeddings are pre-computed once
 and cached. The result is a full SDXL LoRA training at about 1 s/it at 512 px.
 
+## What it produces
+
+Trained on 38 images of a single character for 5 epochs, then sampled with
+ComfyUI (rank 24, 832x1216):
+
+<p align="center">
+  <img src="examples/sample_1.png" width="45%">
+  <img src="examples/sample_2.png" width="45%">
+</p>
+
 ---
 
 ## Benchmark
@@ -17,13 +27,17 @@ and cached. The result is a full SDXL LoRA training at about 1 s/it at 512 px.
 Measured on **RTX 4050 Laptop, 6 GB VRAM, 16 GB RAM**, Windows 11, bf16,
 rank 16, gradient checkpointing on:
 
-| Resolution | Peak VRAM | Speed | Status |
+| Resolution | Peak VRAM | Speed (steady state) | Status |
 |---|---|---|---|
-| 512 x 512 | 5.2 GB | 1.0 s/it | ok |
-| 768 x 768 | 6.1 GB | 2.6 s/it | ok, close to the limit |
+| 512 x 512 | 5.20 GB | ~1.0 s/it | ok |
+| 768 x 768 | 6.1 GB | ~2.6 s/it | ok, close to the limit |
 | 1024 x 1024 | - | - | out of memory |
 
-Re-run ```python benchmark.py``` on your own card to reproduce. Above 768 px
+The 10-step benchmark script prints 11 s/it because the first iterations pay
+CUDA kernel warm-up; steady-state figures come from full runs. Both are listed
+in [docs/vram_benchmark.md](docs/vram_benchmark.md).
+
+Re-run `python benchmark.py` on your own card to reproduce. Above 768 px
 will need a bigger card.
 
 ## How it works
